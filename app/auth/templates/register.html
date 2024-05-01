@@ -12,17 +12,22 @@
 				<form method="POST">
 					<div class="my-3">
 						<label for="email" class="form-label"> Email </label>
-						<input type="email" class="form-control" id="email">
+						<input required type="email" class="form-control" id="email" name="email">
+						{% if errors %}
+						{% if "email" in errors %}
+						<p class="small text-{{errors["email"][1]}}">{{errors["email"][0]}}</p>
+						{% endif %}
+						{% endif %}
 					</div>
 					<div class="my-3">
 						<label for="password" class="form-label"> Password </label>
-						<input type="PASSWORD" class="form-control" id="password">
+						<input required type="PASSWORD" class="form-control" id="password" name="password">
 					</div>
 					<button type="submit" class="px-5 d-block mx-auto btn btn-success">Register</button>
 				</form>
 			</div>
 			<div class="card-footer">
-				Have an account! Login.
+				Have an account! <a href="{{url_for("auth.login")}}" class="link-underline-light">Login.</a>
 			</div>
 		</div>
 	</div>

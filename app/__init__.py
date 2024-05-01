@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask
-from app.extensions import db
+from app.database import db
 from app.auth import bp as auth_bp
 
 
