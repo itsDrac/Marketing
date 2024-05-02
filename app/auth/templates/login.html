@@ -9,14 +9,19 @@
 				<h3 class="justify-content-center fw-bold">Marketing agency login to a account.</h3>
 			</div>
 			<div class="card-body">
-				<form>
+				<form method="POST">
 					<div class="my-3">
 						<label for="email" class="form-label"> Email </label>
-						<input type="email" class="form-control" id="email">
+						<input name="email" type="email" class="form-control" id="email">
+						{% if errors %}
+						{% if "email" in errors %}
+						<p class="small text-{{errors["email"][1]}}">{{errors["email"][0]}}</p>
+						{% endif %}
+						{% endif %}
 					</div>
 					<div class="my-3">
 						<label for="password" class="form-label"> Password </label>
-						<input type="PASSWORD" class="form-control" id="password">
+						<input name="password" type="PASSWORD" class="form-control" id="password">
 					</div>
 					<button type="submit" class="px-5 d-block mx-auto btn btn-success">Submit</button>
 				</form>
