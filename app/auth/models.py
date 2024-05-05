@@ -1,13 +1,18 @@
 from app.database import db
 from app.auth.errors import UserAlreadyExist, UserDoesntExist
-from sqlalchemy.orm import Mapped, mapped_column
+from app.lex.models import LexAcc
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import generate_password_hash, check_password_hash
+from typing import List, Optional
 
 
 class Agency(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, init=False)
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str] = mapped_column(deferred=True)
+    lex_acces: Mapped[Optional[List["LexAcc"]]] = relationship(
+            back_populates="agency", cascade="all, delete-orphan", init=False
+            )
 
     @staticmethod
     def create_agency(email, password):
