@@ -1,4 +1,4 @@
-from app.auth.errors import LoginFunctionUndefined
+from app.errors import LoginFunctionUndefined
 from flask import session, current_app, redirect, url_for
 from functools import wraps
 

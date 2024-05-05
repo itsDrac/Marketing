@@ -11,5 +11,5 @@ class UserDoesntExist(Exception):
 
 
 class LoginFunctionUndefined(Exception):
-    msg="login function was not defined in configrations of app"
-    category="danger"
+    msg = "login function was not defined in configrations of app"
+    category = "danger"
