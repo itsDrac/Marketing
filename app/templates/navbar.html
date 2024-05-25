@@ -1,0 +1,25 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container">
+    <a class="navbar-brand" href="#">Marketing Tracking</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+	{% set page = request.endpoint|replace("main.","") %}
+	{% if session.currentAgency %}
+		<div class="navbar-nav">
+			<a class="mx-2 nav-link {% if page == "lex_main" %}active{% endif %}" aria-current="{% if page == "login" %}true{% else %} false{% endif %}" href="#">Lex Office Accounts</a>
+			<a class="mx-2 nav-link {% if page == "sev_main" %}active{% endif %}" aria-current="{% if page == "login" %}true{% else %} false{% endif %}" href="#">Sevdesk Accounts</a>
+		</div>
+		<div class="navbar-nav ms-auto">
+			<a class="nav-link mx-2" href="#">Logout</a>
+		</div>
+		{% else %}
+		<div class="navbar-nav ms-auto">
+			<a class="nav-link mx-2 {% if page == "login" %}active{% endif %}" href="{{ url_for("main.login") }}" aria-current="{% if page == "login" %}true{% else %} false{% endif %}" >Login</a>
+			<a class="nav-link mx-2 {% if page == "register" %}active{% endif %}" href="{{ url_for("main.register") }}" aria-current="{% if page == "register" %}true{% else %} false{% endif %}" >Register</a>
+		</div>
+	{% endif %}
+    </div>
+  </div>
+</nav>

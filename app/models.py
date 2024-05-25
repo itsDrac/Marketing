@@ -1,5 +1,5 @@
 from app.database import db
-from app.errors import UserAlreadyExist, UserDoesntExist
+from app.errors import UserAlreadyExist, UserDoesntExist, CustomerAlreadyExist
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -47,7 +47,55 @@ class Agency(db.Model):
 class LexAcc(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, init=False)
     key: Mapped[str] = mapped_column(unique=True)
+    orgID: Mapped[str] = mapped_column(unique=True)
     agency_id: Mapped[int] = mapped_column(ForeignKey("agency.id"))
     agency: Mapped["Agency"] = relationship(back_populates="lex_acces")
+    customers: Mapped[Optional[List["Customer"]]] = relationship(
+            back_populates="lexAcc", cascade="all, delete-orphan", init=False
+            )
     name: Mapped[str]
     added_on: Mapped[datetime] = mapped_column(default_factory=datetime.utcnow)
+
+    def add_customer(self, lexID, name):
+        existingCustomer = db.session.execute(
+                db.select(Customer).filter_by(lexID=lexID)
+                ).scalar_one_or_none()
+        if existingCustomer:
+            raise CustomerAlreadyExist("Customer already exist.", "danger")
+        newCustomer = Customer(lexID=lexID, lexAccId=self.id, lexAcc=self, name=name)
+        db.session.add(newCustomer)
+
+
+class Customer(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    lexID: Mapped[str] = mapped_column(unique=True)
+    lexAccId: Mapped[int] = mapped_column(ForeignKey("lex_acc.id"))
+    lexAcc: Mapped["LexAcc"] = relationship(back_populates="customers")
+    name: Mapped[str]
+    # invoices: Mapped[Optional[List["Invoice"]]] = relationship(
+    #         back_populates="customer", cascade="all, delete-orphan", init=False
+    #         )
+    totalGrossAmount: Mapped[float] = mapped_column(
+            nullable=False,
+            init=False,
+            default_factory=lambda: 0.0
+            )
+    totalNetAmount: Mapped[float] = mapped_column(
+            nullable=False,
+            init=False,
+            default_factory=lambda: 0.0
+            )
+    addedOn: Mapped[datetime] = mapped_column(default_factory=datetime.utcnow)
+
+    def add_invoice_amounts(self, grossAmount, netAmount):
+        self.totalGrossAmount += grossAmount
+        self.totalNetAmount += netAmount
+
+
+# class Invoice(db.Model):
+#     id: Mapped[int] = mapped_column(primary_key=True, init=False)
+#     lexID: Mapped[str] = mapped_column(unique=True)
+#     customerID: Mapped[int] = mapped_column(ForeignKey("customer.id"))
+#     customer: Mapped["Customer"] = relationship(back_populates="invoices")
+#     gorssAmount: Mapped[float] = mapped_column(nullable=False)
+#     netAmount: Mapped[float] = mapped_column(nullable=False)

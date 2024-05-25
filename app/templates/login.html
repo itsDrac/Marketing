@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% block head %}
-	<title>Login | Track Leads.</title>
+	<title>login | track leads.</title>
 {% endblock %}
 {% block body %}
-	<div class="container min-vh-100 d-flex justify-content-center align-items-center">
+	<div class="container align-items-center pt-5">
+		<div class="d-flex justify-content-center mt-5">
 		<div class="card bg-light bg-gradient p-5">
 			<div class="card-title">
 				<h3 class="justify-content-center fw-bold">Marketing agency login to a account.</h3>
@@ -29,6 +30,7 @@
 			<div class="card-footer">
 				Don't have an account! <a href="{{url_for("main.register")}}" class="link-underline-light">Register.</a>
 			</div>
+		</div>
 		</div>
 	</div>
 {% endblock %}

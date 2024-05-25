@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Main Page| Marketing Agency</title>
+	<script src="https://unpkg.com/htmx.org@1.9.12"></script>
+{% endblock %}
+{% block body %}
+<div class="container">
+	<section class="my-3">
+		<h1 class="display-1">Customers of Lex Office</h1>
+		<p class="lead">List of all the customers linked to this lex account<p>
+		<p class="lead">To add new customer to this lex office account Click in below button and enter customer id then click on check button to confirm with customer name, Once confirmed you can click of add customer<p>
+		<div class="mt-5 row">
+			<div class="col-4">
+			<button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#AddCusModel">Add new customer</button>
+			</div>
+			<div class="col-4 mx-auto">
+				<p class="text-start"> total gross amount: 
+				{% set ns = namespace(totalGross=0.0, totalNet=0.0) %}
+				{% for c in customers %}
+				{% set ns.totalGross = ns.totalGross+c.totalGrossAmount %}
+				{% set ns.totalNet = ns.totalNet+c.totalNetAmount %}
+				{% endfor %}
+				<span class="text-end p-1 text-bg-success">{{ ns.totalGross }}</span>
+				</p>
+			</div>
+			<div class="col-4 ms-auto">
+				<p class="text-start"> total net amount: 
+				<span class="text-end p-1 text-bg-success">{{ ns.totalNet }}</span>
+				</p>
+			</div>
+		</div>
+	</section>
+	<section>
+		<table class="table table-bordered table-striped table-hover">
+			<thead>
+				<tr>
+					<th scope="col">S.no.</th>
+					<th scope="col">Customer Name</th>
+					<th scope="col" class="text-center">Gross Amounts</th>
+					<th scope="col" class="text-center">Net Amounts</th>
+					<th scope="col" class="text-center">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for customer in customers %}
+				<tr>
+					<th scope="row">{{ loop.index }}</th>
+					<td>{{ customer.name }}</td>
+					<td class="text-center">
+						<p class="text-success">{{ customer.totalGrossAmount }}</p>
+					</td>
+					<td class="text-center">
+						<p class="text-success">{{ customer.totalNetAmount }}</p>
+					</td>
+					<td class="text-center">
+						<button class="btn btn-outline-danger">Delete</button>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</section>
+	<!-- Vertically centered modal -->
+	<div class="modal fade" id="AddCusModel" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Add Cutstomer</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p> Enter the customer ID from lex account</p>
+					<form class="row" method="POST">
+						<div class="col-8">
+						<input class="form-control" id="lexApiKey" name="lexApiKey" type="text" value="{{ lexApiKey }}" hidden>
+						<input class="form-control" id="customerId" name="customerId" type="text" placeholder="Enter Customer ID" aria-label="Enter the customer ID which you would like to link in this lex account">
+						</div>
+						<div class="col-auto">
+							<button type="button" class="btn btn-outline-warning" hx-get="{{ url_for('main.lex_get_customer') }}" hx-include="#lexApiKey,#customerId" hx-target="#customerName" hx-indicator="#indicator">Check</button>
+						</div>
+						<div class="col-auto my-2" id="customerName">
+							<img class="htmx-indicator" id="indicator" src="{{ url_for('static', filename="image/loading.gif") }}">
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+

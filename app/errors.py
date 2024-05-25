@@ -13,3 +13,9 @@ class UserDoesntExist(Exception):
 class LoginFunctionUndefined(Exception):
     msg = "login function was not defined in configrations of app"
     category = "danger"
+
+
+class CustomerAlreadyExist(Exception):
+    def __init__(self, msg="Customer already exist", category="danger"):
+        self.msg = msg
+        self.category = category

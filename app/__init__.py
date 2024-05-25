@@ -16,6 +16,7 @@ def create_app(test_config=None):
 
     @app.route("/")
     def hello():
+        print(app.config['LEX_EVENT_CALLBACK_URL'])
         return "Hello World!"
 
     return app
