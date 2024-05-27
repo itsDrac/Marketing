@@ -54,6 +54,7 @@ class LexAcc(db.Model):
             back_populates="lexAcc", cascade="all, delete-orphan", init=False
             )
     name: Mapped[str]
+    source: Mapped[str] = mapped_column(nullable=False)
     added_on: Mapped[datetime] = mapped_column(default_factory=datetime.utcnow)
 
     def add_customer(self, lexID, name):
@@ -64,6 +65,7 @@ class LexAcc(db.Model):
             raise CustomerAlreadyExist("Customer already exist.", "danger")
         newCustomer = Customer(lexID=lexID, lexAccId=self.id, lexAcc=self, name=name)
         db.session.add(newCustomer)
+        return newCustomer
 
 
 class Customer(db.Model):

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Main Page| Marketing Agency</title>
+	<script src="https://unpkg.com/htmx.org@1.9.12"></script>
+{% endblock %}
+{% block body %}
+<div class="container">
+	<section class="my-3">
+		<h1 class="display-1">Customers of Sevdesk</h1>
+		<p class="lead">List of all the customers linked to this sevdesk account<p>
+		<p class="lead">To add new entry click on below add button and paste invoice id Click on check button to confirm the contact name, once confirmed click on add.<p>
+		<p class="lead text-info">Note: If the customer already existes in below table then the amount would be automaticly incremented, else new customer will be added.<p>
+		<div class="mt-5 row">
+			<div class="col-4">
+			<button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#AddCusModel">Add new invoice</button>
+			</div>
+			{% set ns = namespace(totalGross=0.0, totalNet=0.0) %}
+			<div class="col-4 mx-auto">
+				<p class="text-start"> total gross amount: 
+				{% for c in customers %}
+				{% set ns.totalGross = ns.totalGross+c.totalGrossAmount %}
+				{% set ns.totalNet = ns.totalNet+c.totalNetAmount %}
+				{% endfor %}
+				<span class="text-end p-1 text-bg-success">{{ ns.totalGross }}</span>
+				</p>
+			</div>
+			<div class="col-4 ms-auto">
+				<p class="text-start"> total net amount: 
+				<span class="text-end p-1 text-bg-success">{{ ns.totalNet }}</span>
+				</p>
+			</div>
+		</div>
+	</section>
+	<section>
+		<table class="table table-bordered table-striped table-hover">
+			<thead>
+				<tr>
+					<th scope="col">S.no.</th>
+					<th scope="col">Customer Name</th>
+					<th scope="col" class="text-center">Gross Amounts</th>
+					<th scope="col" class="text-center">Net Amounts</th>
+					<th scope="col" class="text-center">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for customer in customers %}
+				<tr>
+					<th scope="row">{{ loop.index }}</th>
+					<td>{{ customer.name }}</td>
+					<td class="text-center">
+						<p class="text-success">{{ customer.totalGrossAmount }}</p>
+					</td>
+					<td class="text-center">
+						<p class="text-success">{{ customer.totalNetAmount }}</p>
+					</td>
+					<td class="text-center">
+						<button class="btn btn-outline-danger">Delete</button>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</section>
+	<!-- Vertically centered modal -->
+	<div class="modal fade" id="AddCusModel" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Add invoice id</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p> Enter the invoice ID from sevdesk account</p>
+					<form class="row" method="POST">
+						<div class="col-8">
+						<input class="form-control" id="sevApiKey" name="sevApiKey" type="text" value="{{ sevApiKey }}" hidden>
+						<input class="form-control" id="invoiceid" name="invoiceid" type="text" placeholder="Enter Invoice ID" aria-label="Enter the invoice ID which you like to fatch">
+						</div>
+						<div class="col-auto">
+							<button type="button" class="btn btn-outline-warning" hx-get="{{ url_for('main.sev_get_invoice') }}" hx-include="#sevApiKey,#invoiceid" hx-target="#customerName" hx-indicator="#indicator">Check</button>
+						</div>
+						<div class="col-auto my-2" id="customerName">
+							<img class="htmx-indicator" id="indicator" src="{{ url_for('static', filename="image/loading.gif") }}">
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+

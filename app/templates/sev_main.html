@@ -1,14 +1,13 @@
 {% extends "base.html" %}
 {% block head %}
-	<title>Lex Office Main Page| Marketing Agency</title>
-	<script src="https://unpkg.com/htmx.org@1.9.12"></script>
+	<title>SevDesk Main Page| Marketing Agency</title>
 {% endblock %}
 {% block body %}
 <div class="container">
 	<section class="my-3">
-		<h1 class="display-1">Lex Office Accounts</h1>
-		<p class="lead">List of all the Lex Accounts linked to this Marketing Agency<p>
-		<p class="lead">To add a new lex account click on the below button, and enter the API key for the account. Once account is added you can add customers by entering there ID. Our website will automaticly detect newly created invoice in the lex office account and it will match with the customer's detail If matched we'll store the amount of invoice. Use the edit button to edit the API key of already added account.<p>
+		<h1 class="display-1">SevDesk Accounts</h1>
+		<p class="lead">List of all the Sevdesk Accounts linked to this Marketing Agency<p>
+		<p class="lead">To add a new Sevdesk account click on the below button, and enter the API key for the account. Once account is added you can add the invoice by clicking on the customer button on organization name and add Invoice id<p>
 		<div class="mt-5">
 			<button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#AddAccModel">Add new account</button>
 		</div>
@@ -23,15 +22,15 @@
 				</tr>
 			</thead>
 			<tbody>
-				{% for lexacc in lexaccs %}
+				{% for sevacc in sevaccs %}
 				<tr>
 					<th scope="row">{{ loop.index }}</th>
-					<td>{{ lexacc.name }}</td>
+					<td>{{ sevacc.name }}</td>
 					<td class="text-center">
 						<button class="btn btn-warning">Edit</button>
 					</td>
 					<td class="text-center">
-						<a href={{ url_for('main.lex_customer', lexid=lexacc.id ) }}>
+						<a href="{{ url_for('main.sev_invoice', sevid=sevacc.id) }}">
 						<button class="btn btn-primary">Customers</button>
 						</a>
 					</td>
@@ -48,17 +47,17 @@
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title">Add Lex Account</h5>
+					<h5 class="modal-title">Add SevDesk Account</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<p> Add API Key of lex Account in below field and click on check to confirm the Account by organization name</p>
+					<p> Add API Key of Sevdesk Account in below field and click on check to confirm the Account by organization name</p>
 					<form class="row" method="POST">
 						<div class="col-8">
-						<input class="form-control" id="apikey" name="key" type="text" placeholder="API Key" aria-label="Enter the API Key for Lex office account">
+						<input class="form-control" id="apikey" name="key" type="text" placeholder="API Key" aria-label="Enter the API Key for SevDesk account">
 						</div>
 						<div class="col-auto">
-							<button type="button" class="btn btn-outline-warning" hx-get="{{ url_for('main.lex_get_org') }}" hx-include="#apikey" hx-target="#orgname" hx-indicator="#indicator">Check</button>
+							<button type="button" class="btn btn-outline-warning" hx-get="{{ url_for('main.sev_get_org') }}" hx-include="#apikey" hx-target="#orgname" hx-indicator="#indicator">Check</button>
 						</div>
 						<div class="col-auto my-2" id="orgname">
 							<img class="htmx-indicator" id="indicator" src="{{ url_for('static', filename="image/loading.gif") }}">
@@ -70,4 +69,3 @@
 	</div>
 </div>
 {% endblock %}
-

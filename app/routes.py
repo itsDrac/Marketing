@@ -5,7 +5,12 @@ from app.models import (
         )
 from app.errors import UserDoesntExist, UserAlreadyExist, CustomerAlreadyExist
 from app.database import db
-from app.utils import login_required
+from app.utils import (
+        login_required,
+        subscribe_to_invoice_event,
+        add_invoice, is_admin,
+        fetch_sev_invoice
+        )
 from flask import (
         Blueprint,
         request,
@@ -40,6 +45,8 @@ def login():
 
         sessionAgency['id'] = existingAgency.id
         sessionAgency['email'] = existingAgency.email
+        sessionAgency['isAdmin'] = is_admin(existingAgency.email)
+        print(sessionAgency)
         session['currentAgency'] = sessionAgency
 
         flash("Agency is Loggedin", "success")
@@ -94,49 +101,19 @@ def lex_main():
                 orgID=orgid,
                 agency_id=agency_id,
                 agency=currentAgency,
-                name=orgname)
+                name=orgname,
+                source="Lex"
+                )
         db.session.add(lexacc)
         db.session.commit()
         subscribe_to_invoice_event(lexacc.id)
         return redirect(url_for("main.lex_main"))
 
     lexaccs = db.session.execute(
-            db.select(LexAccModel).filter_by(agency_id=agency_id)
-            ).scalars()
+        db.select(LexAccModel).filter_by(agency_id=agency_id).filter_by(source="Lex")
+        ).scalars()
 
     return render_template("Lex_main.html", lexaccs=lexaccs)
-
-
-def subscribe_to_invoice_event(lexaccID):
-    currentLexacc = db.get_or_404(LexAccModel, lexaccID)
-    key = "Bearer " + currentLexacc.key.strip()
-    headers = {
-            "Authorization": key,
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-            }
-    jsonData = {
-            "eventType": "invoice.created",
-            "callbackUrl": "https://7d3a-2409-40d0-8-b664-9964-78d4-915d-d45b.ngrok-free.app"+"/invoice-event-callback"
-            }
-    res = rq.post(
-            "https://api.lexoffice.io/v1/event-subscriptions",
-            headers=headers,
-            json=jsonData
-            )
-
-    print(res.status_code)
-
-    if res.json().get("id"):
-        print("invoice event subscribed")
-        print(res.json().get("resourceUri"))
-        flash(f"{currentLexacc.name} is subscribed to invoice created", "success")
-        return
-    else:
-        print(res.json())
-        print(res.status_code)
-        print("invoice event did not subscribed")
-        flash(f"{currentLexacc.name} is not subscribed to invoice created", "warning")
 
 
 @bp.route('/lex-get-org')
@@ -161,11 +138,12 @@ def lex_get_org():
 @login_required
 def lex_customer(lexid: int):
     agency_id = session['currentAgency'].get("id")
-    currentAgency = db.get_or_404(AgencyModel, agency_id)
-    for lexacc in currentAgency.lex_acces:
-        if lexacc.id == lexid:
-            currentLexacc = lexacc
-    if not currentLexacc:
+    # currentAgency = db.get_or_404(AgencyModel, agency_id)
+    currentLexacc = db.get_or_404(LexAccModel, lexid)
+    # for lexacc in currentAgency.lex_acces:
+    #     if lexacc.id == lexid:
+    #         currentLexacc = lexacc
+    if currentLexacc.agency_id != agency_id:
         flash("Incorrect lex account id", "danger")
         return redirect(url_for("main.lex_main"))
     if request.method == "POST":
@@ -178,7 +156,6 @@ def lex_customer(lexid: int):
         except CustomerAlreadyExist as e:
             flash(e.msg, e.category)
 
-    print("In lex main function--> ", currentLexacc.id)
     customers = db.session.execute(
             db.select(CustomerModel).filter_by(lexAccId=currentLexacc.id)
             ).scalars().fetchall()
@@ -239,30 +216,110 @@ def fetch_invoice_data(invoiceID, orgID):
     url = "https://api.lexoffice.io/v1/invoices/"+invoiceID.strip()
     res = rq.get(url, headers=headers)
     add_invoice(res.json())
-
-
-def add_invoice(invoice_data):
-    currentLexacc = db.session.execute(
-            db.select(LexAccModel).filter_by(orgID=invoice_data.get("organizationId"))
-            ).scalar_one_or_none()
-    if not currentLexacc:
-        return None
-    customerID = invoice_data.get("address").get("contactId")
-    if not customerID:
-        return None
-    currentCustomer = db.session.execute(
-            db.select(CustomerModel).filter_by(lexID=customerID)
-            ).scalar_one_or_none()
-    if not currentCustomer:
-        return None
-    # Add Invoice gross and net amount and link it with current customer.
-    currentCustomer.add_invoice_amounts(
-            invoice_data.get("totalPrice").get("totalGrossAmount"),
-            invoice_data.get("totalPrice").get("totalNetAmount"),
-            )
-    db.session.commit()
-# TODO: Add a webhook callback url for invoice
-# TODO: Need to check whenever that webhook callback URL is requested.
-# TODO: With the given data I'll fetch the lex office and check of the user would
+# Add a webhook callback url for invoice
+# Need to check whenever that webhook callback URL is requested.
+# With the given data I'll fetch the lex office and check of the user would
 # have added the customer I'll have to add the invoice in database.
-# TODO: Need to create a table for Invoice. with net and gross amount for customer.
+# Need to create a table for Invoice. with net and gross amount for customer.
+# Need to build Sevdesk main account
+
+
+@bp.route("/sev-main", methods=["GET", "POST"])
+@login_required
+def sev_main():
+    agency_id = session['currentAgency'].get("id")
+    currentAgency = db.get_or_404(AgencyModel, agency_id)
+    if request.method == "POST":
+        apikey = request.form.get("key")
+        orgname = request.form.get("orgname")
+        orgid = request.form.get("orgid")
+        print(f"in Sev Desk function \n{apikey= }, {orgname= }, {orgid= }")
+        existingLex = db.session.execute(
+                db.select(LexAccModel).filter_by(key=apikey)
+                ).scalar_one_or_none()
+        if existingLex:
+            flash("This account is already added for this agency", "danger")
+            return redirect(url_for("main.sev_main"))
+        sevacc = LexAccModel(
+                key=apikey,
+                orgID=orgid,
+                agency_id=agency_id,
+                agency=currentAgency,
+                name=orgname,
+                source="Sev"
+                )
+        db.session.add(sevacc)
+        db.session.commit()
+
+    sevaccs = db.session.execute(
+        db.select(LexAccModel).filter_by(agency_id=agency_id).filter_by(source="Sev")
+        ).scalars()
+
+    return render_template("sev_main.html", sevaccs=sevaccs)
+
+
+@bp.route("/sev-get-org")
+def sev_get_org():
+    key = request.args.get("key")
+    if not key:
+        return "No key found"
+    headers = {"Authorization": key, "Accept": "application/json"}
+    payloads = {"embed": "sevClient"}
+    url = "https://my.sevdesk.de/api/v1/CheckAccount"
+    res = rq.get(url, headers=headers, params=payloads)
+    if res.status_code != 200:
+        return render_template("htmx/sev_org_name.html", orgname=None)
+    orgname = res.json().get("objects")[0].get("sevClient").get("name")
+    orgid = res.json().get("objects")[0].get("sevClient").get("id")
+    return render_template("htmx/sev_org_name.html", orgname=orgname, orgid=orgid)
+
+
+# Make Invoice page for Sevdesk account.
+@bp.route("/sev-invoice/<int:sevid>", methods=["GET", "POST"])
+def sev_invoice(sevid: int):
+    agency_id = session['currentAgency'].get("id")
+    currentSevacc = db.get_or_404(LexAccModel, sevid)
+    sevApiKey = currentSevacc.key
+    if currentSevacc.agency_id != agency_id:
+        flash("Incorrect lex account id", "danger")
+        return redirect(url_for("main.lex_main"))
+    if request.method == "POST":
+        invoiceId = request.form.get("invoiceid")
+        customerName = request.form.get("customerName")
+        # key = request.form.get("sevApiKey")
+        res = fetch_sev_invoice(sevApiKey, invoiceId.strip()).json()
+        customerSevID = res.get("objects")[0].get("contact").get("id")
+        existingCustomer = db.session.execute(
+                db.select(CustomerModel).filter_by(lexID=customerSevID)
+                ).scalar_one_or_none()
+        if not existingCustomer:
+            existingCustomer = currentSevacc.add_customer(customerSevID, customerName)
+        existingCustomer.totalGrossAmount += float(res.get("objects")[0].get("sumGross"))
+        existingCustomer.totalNetAmount += float(res.get("objects")[0].get("sumNet"))
+        db.session.commit()
+
+        print(f"{invoiceId= } {sevApiKey= } \n post method of sev_invoice l:285")
+    customers = db.session.execute(
+            db.select(CustomerModel).filter_by(lexAccId=currentSevacc.id)
+            ).scalars().fetchall()
+    return render_template("sev_invoice.html",
+                           sevApiKey=sevApiKey,
+                           customers=customers
+                           )
+
+
+# Make Invoice page for Sevdesk account.
+@bp.route("/sev-get-invoice")
+def sev_get_invoice():
+    invoiceId = request.args.get("invoiceid")
+    key = request.args.get("sevApiKey")
+    if not key:
+        return "No key found"
+    if not invoiceId:
+        return "No customerId found"
+    res = fetch_sev_invoice(key, invoiceId.strip())
+    if res.status_code != 200:
+        return render_template("htmx/sev_invoice_details.html", customerName=None)
+    customerName = f"{res.json().get('objects')[0].get('contact').get('surename')} \
+{res.json().get('objects')[0].get('contact').get('familyname')}"
+    return render_template("htmx/sev_invoice_details.html", customerName=customerName)

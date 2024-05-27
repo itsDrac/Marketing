@@ -1,0 +1,10 @@
+{% if customerName %}
+<input class="form-control-plaintext" id="customerName" name="customerName" type="text" value="{{ customerName }}" readonly>
+<button type="SUBMIT" class="btn btn-success">Add Customer</button>
+{% else %}
+<p class="my-2">
+	<strong class="text-bg-danger p-3">
+		Invalid customer id or Customer isn't added by this lexOffice account, Please try again.
+	</strong>
+</p>
+{% endif %}

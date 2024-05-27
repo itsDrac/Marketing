@@ -1,0 +1,12 @@
+{% if orgname %}
+<input class="form-control-plaintext form-control-lg" id="orgname" name="orgname" type="text" value="{{ orgname}}" readonly>
+<input class="form-control-plaintext" id="orgid" name="orgid" type="text" value="{{ orgid }}" hidden readonly>
+<button type="SUBMIT" class="btn btn-success">Add Account</button>
+{% else %}
+<p class="my-2">
+	<strong class="text-bg-danger p-3">
+		Invalid API key, Please try again.
+	</strong>
+</p>
+{% endif %}
+

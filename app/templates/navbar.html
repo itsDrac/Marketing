@@ -8,11 +8,14 @@
 	{% set page = request.endpoint|replace("main.","") %}
 	{% if session.currentAgency %}
 		<div class="navbar-nav">
-			<a class="mx-2 nav-link {% if page == "lex_main" %}active{% endif %}" aria-current="{% if page == "login" %}true{% else %} false{% endif %}" href="#">Lex Office Accounts</a>
-			<a class="mx-2 nav-link {% if page == "sev_main" %}active{% endif %}" aria-current="{% if page == "login" %}true{% else %} false{% endif %}" href="#">Sevdesk Accounts</a>
+			<a class="mx-2 nav-link {% if page == "lex_main" %}active{% endif %}" aria-current="{% if page == "login" %}true{% else %} false{% endif %}" href="{{ url_for('main.lex_main') }}">Lex Office Accounts</a>
+			<a class="mx-2 nav-link {% if page == "sev_main" %}active{% endif %}" aria-current="{% if page == "login" %}true{% else %} false{% endif %}" href="{{ url_for('main.sev_main') }}">Sevdesk Accounts</a>
 		</div>
 		<div class="navbar-nav ms-auto">
-			<a class="nav-link mx-2" href="#">Logout</a>
+		{% if session.currentAgency.isAdmin %}
+			<a class="nav-link mx-2" href="{{ url_for('admin.main') }}">Admin</a>
+		{% endif %}
+			<a class="nav-link mx-2" href="{{ url_for('main.logout') }}">Logout</a>
 		</div>
 		{% else %}
 		<div class="navbar-nav ms-auto">
