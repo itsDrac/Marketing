@@ -4,8 +4,23 @@
 {% endblock %}
 {% block body %}
 <div class="container">
-	{{ session.currentAgency }}
-	{{ session.email }}
-	<h1 class="pt-5 mt-4">Hello Admin</h1>
+	<section class="my-3">
+		<h1 class="display-1">Admin view of marketing agency</h1>
+		<p class="lead">In this page you'll get the list of all the marketing agency and lexoffice/sevdesk account linked to them with total income made.<p>
+		<p class="lead">Click on below button to switch between list of lex office accounts and list of sevdesk accounts<p>
+		<div class="mt-5 form-check form-check-inline">
+			<input type="radio" class="btn-check" name="options-outlined" id="lexoffice-btn" autocomplete="off" checked hx-get="{{ url_for('admin.all_agency') }}" hx-trigger="load,change" hx-target="#agency-return" hx-indicator="#indicator" hx-vals='{"source":"Lex"}'>
+			<label class="btn btn-lg btn-outline-success px-4" for="lexoffice-btn">Lex Office</label>
+			<input type="radio" class="btn-check" name="options-outlined" id="sevdesk-btn" autocomplete="off" hx-get="{{ url_for('admin.all_agency') }}" hx-target="#agency-return" hx-indicator="#indicator" hx-vals='{"source":"Sev"}'>
+			<label class="btn btn-lg btn-outline-success ms-4 px-4" for="sevdesk-btn">Sevdesk</label>
+		<div id="indicator" class="d-inline htmx-indicator text-center m-5">
+			<div class="spinner-grow text-success" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+		</div>
+	</section>
+		<section id="agency-return">
+		</section>
 </div>
 {% endblock %}

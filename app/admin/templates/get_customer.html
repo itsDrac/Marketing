@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Admin View| Marketing Agency</title>
+{% endblock %}
+{% block body %}
+<div class="container">
+	<section class="my-3">
+		<h1 class="display-1">Admin View</h1>
+		<p class="lead">List of all the customers linked to this lex Office/Sevdesk account.<p>
+		<div class="mt-5 row">
+			<div class="col-2 mr-auto">
+				<a class="btn btn-outline-info" href="{{ url_for('admin.main') }}">Back</a>
+			</div>
+			<div class="col-4 mx-auto">
+				<p class="text-start"> total gross amount: 
+				{% set ns = namespace(totalGross=0.0, totalNet=0.0) %}
+				{% for c in customers %}
+				{% set ns.totalGross = ns.totalGross+c.totalGrossAmount %}
+				{% set ns.totalNet = ns.totalNet+c.totalNetAmount %}
+				{% endfor %}
+				<span class="text-end p-1 text-bg-success">{{ ns.totalGross }}</span>
+				</p>
+			</div>
+			<div class="col-4 ms-auto">
+				<p class="text-start"> total net amount: 
+				<span class="text-end p-1 text-bg-success">{{ ns.totalNet }}</span>
+				</p>
+			</div>
+		</div>
+	</section>
+	<section>
+		<table class="table table-bordered table-striped table-hover">
+			<thead>
+				<tr>
+					<th scope="col">S.no.</th>
+					<th scope="col">Customer Name</th>
+					<th scope="col" class="text-center">Gross Amounts</th>
+					<th scope="col" class="text-center">Net Amounts</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for customer in customers %}
+				<tr>
+					<th scope="row">{{ loop.index }}</th>
+					<td>{{ customer.name }}</td>
+					<td class="text-center">
+						<p class="text-success">{{ customer.totalGrossAmount }}</p>
+					</td>
+					<td class="text-center">
+						<p class="text-success">{{ customer.totalNetAmount }}</p>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</section>
+</div>
+{% endblock %}
+

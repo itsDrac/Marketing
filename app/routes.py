@@ -90,6 +90,7 @@ def lex_main():
         orgname = request.form.get("orgname")
         orgid = request.form.get("orgid")
         print(f"in Lex-main function \n{apikey= }, {orgname= }, {orgid= }")
+        # TODO: update different agency to add same lex account.
         existingLex = db.session.execute(
                 db.select(LexAccModel).filter_by(key=apikey)
                 ).scalar_one_or_none()
@@ -216,12 +217,6 @@ def fetch_invoice_data(invoiceID, orgID):
     url = "https://api.lexoffice.io/v1/invoices/"+invoiceID.strip()
     res = rq.get(url, headers=headers)
     add_invoice(res.json())
-# Add a webhook callback url for invoice
-# Need to check whenever that webhook callback URL is requested.
-# With the given data I'll fetch the lex office and check of the user would
-# have added the customer I'll have to add the invoice in database.
-# Need to create a table for Invoice. with net and gross amount for customer.
-# Need to build Sevdesk main account
 
 
 @bp.route("/sev-main", methods=["GET", "POST"])

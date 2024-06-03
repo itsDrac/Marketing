@@ -17,6 +17,15 @@ def login_required(func):
     return decorated_view
 
 
+def admin_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if not session.get("currentAgency").get("isAdmin"):
+            return redirect(url_for("main.lex_main"))
+        return func(*args, **kwargs)
+    return decorated_view
+
+
 def is_admin(email: str):
     adminList = current_app.config['ADMIN_LIST'].split(',')
     return email in adminList

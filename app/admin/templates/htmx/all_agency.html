@@ -1,0 +1,35 @@
+<div class="accordion" id="accordionPanelsStayOpenExample">
+	{% for r in result %}
+	{% if loop.changed(r.Agency.id) %}
+	<div class="accordion-item">
+		<h2 class="accordion-header">
+			<button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-{{ loop.index }}" {% if loop.first %}aria-expanded="true"{% endif %} aria-controls="panelsStayOpen-{{ loop.index }}">
+				{{ r.Agency.email }}
+			</button>
+		</h2>
+		<div id="panelsStayOpen-{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}">
+			<div class="accordion-body">
+				<table class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th scope="col">#</th>
+							<th scope="col">Client name</th>
+							<th scope="col">Customers</th>
+						</tr>
+					</thead>
+					<tbody>
+	{% endif %}
+						<tr>
+							<td scope="row">{{ loop.index }}</td>
+							<td>{{ r.LexAcc.name }}</td>
+							<td><a href="{{ url_for('admin.get_customer', lexid=r.LexAcc.id) }}">List of customers</a></td>
+						</tr>
+	{% if loop.nextitem is defined and loop.nextitem.Agency.id != r.Agency.id %}
+				</tbody>
+			</table>
+			</div>
+		</div>
+	</div>
+	{% endif %}
+	{% endfor %}
+</div>
