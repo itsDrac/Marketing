@@ -30,6 +30,13 @@ bp = Blueprint('main',
                )
 
 
+@bp.route("/session")
+def check_session():
+    currentAgency = session.get('currentAgency')
+    agency = db.session.execute(db.select(AgencyModel).where(AgencyModel.id == currentAgency.get("id"))).scalar_one_or_none()
+    return [session.get('currentAgency'), agency.id)]
+
+
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     if session.get('currentAgency'):
@@ -84,6 +91,7 @@ def logout():
 @login_required
 def lex_main():
     agency_id = session['currentAgency'].get("id")
+    print("in lex main function", agency_id)
     currentAgency = db.get_or_404(AgencyModel, agency_id)
     if request.method == "POST":
         apikey = request.form.get("key")
