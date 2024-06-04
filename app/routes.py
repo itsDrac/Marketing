@@ -114,7 +114,7 @@ def lex_main():
         db.select(LexAccModel).filter_by(agency_id=agency_id).filter_by(source="Lex")
         ).scalars()
 
-    return render_template("Lex_main.html", lexaccs=lexaccs)
+    return render_template("lex_main.html", lexaccs=lexaccs)
 
 
 @bp.route('/lex-get-org')
