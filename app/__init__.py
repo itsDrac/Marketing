@@ -6,7 +6,7 @@ from app.routes import bp
 from app.admin import bp as admin_bp
 
 
-def create_app(test_config=None):
+def create_app():
     app = Flask(__name__)
 
     app.config.from_prefixed_env()
