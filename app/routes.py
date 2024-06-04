@@ -34,7 +34,8 @@ bp = Blueprint('main',
 def check_session():
     currentAgency = session.get('currentAgency')
     agency = db.session.execute(db.select(AgencyModel).where(AgencyModel.id == currentAgency.get("id"))).scalar_one_or_none()
-    return [session.get('currentAgency'), agency.id]
+    if not agency:
+        return "Couldn't fetch agency"
 
 
 @bp.route("/login", methods=["GET", "POST"])
