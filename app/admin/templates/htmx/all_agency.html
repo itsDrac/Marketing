@@ -15,6 +15,7 @@
 							<th scope="col">#</th>
 							<th scope="col">Client name</th>
 							<th scope="col">Customers</th>
+							<th scope="col">Added on. (UTC Time)</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -23,6 +24,7 @@
 							<td scope="row">{{ loop.index }}</td>
 							<td>{{ r.LexAcc.name }}</td>
 							<td><a href="{{ url_for('admin.get_customer', lexid=r.LexAcc.id) }}">List of customers</a></td>
+							<td>{{ r.LexAcc.added_on.strftime("%d-%b-%Y") }}</td>
 						</tr>
 	{% if loop.nextitem is defined and loop.nextitem.Agency.id != r.Agency.id %}
 				</tbody>

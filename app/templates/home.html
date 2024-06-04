@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Home Page| Marketing Agency</title>
+{% endblock %}
+{% block body %}
+<img src="{{ url_for('static', filename='image/LexOfficeImg.jpg') }}" class="img-fluid" alt="Home Image">
+<div class="container">
+	<h1 class="display-1">Welcome to Maketing Agency tracker</h1>
+	<p class="lead">Our webapp helps you to track your client's customer sales using there lex office and/or Sevdesk business accounts.</p>
+	<a href="{{ url_for('main.register') }}" class="btn btn-outline-success">Join now </a>
+</div>
+{% endblock %}

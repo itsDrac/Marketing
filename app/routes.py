@@ -33,7 +33,7 @@ bp = Blueprint('main',
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     if session.get('currentAgency'):
-        return redirect(url_for("hello"))
+        return redirect(url_for("home"))
     formErrors = {}
     sessionAgency = {}
     if request.method == "POST":
@@ -77,7 +77,7 @@ def register():
 @login_required
 def logout():
     session['currentAgency'] = None
-    return redirect(url_for("hello"))
+    return redirect(url_for("home"))
 
 
 @bp.route('/lex-main', methods=["GET", "POST"])

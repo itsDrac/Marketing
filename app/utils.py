@@ -41,8 +41,8 @@ def subscribe_to_invoice_event(lexaccID):
             }
     jsonData = {
             "eventType": "invoice.created",
-            "callbackUrl": "https://d3a6-2401-4900-1c68-b58c-eca1-6637-1588-e292.ngrok-free.app"+"/invoice-event-callback"
-            # "callbackUrl": url_for("main.invoice_event_callback", _external=True)
+            # "callbackUrl": "https://d3a6-2401-4900-1c68-b58c-eca1-6637-1588-e292.ngrok-free.app"+"/invoice-event-callback"
+            "callbackUrl": url_for("main.invoice_event_callback", _external=True)
             }
     res = rq.post(
             "https://api.lexoffice.io/v1/event-subscriptions",

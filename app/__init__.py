@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, render_template, url_for
 from app.database import db
 from app.routes import bp
 from app.admin import bp as admin_bp
@@ -17,8 +17,8 @@ def create_app(test_config=None):
         db.create_all()
 
     @app.route("/")
-    def hello():
-        print(app.config['LEX_EVENT_CALLBACK_URL'])
-        return "Hello World!"
+    def home():
+        print(url_for("main.invoice_event_callback", _external=True))
+        return render_template("home.html")
 
     return app
