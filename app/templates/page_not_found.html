@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Error Page | track leads.</title>
+{% endblock %}
+{% block body %}
+	<div class="container align-items-center pt-5">
+		<div class="d-flex justify-content-center mt-5">
+		<div class="bg-light bg-gradient p-5">
+			<h1 class="display-1">Error 404</h1>
+			<p class="lead">Requested page can not be found, Please click on below button to return to home page.</p>
+			<a href="{{ url_for('home') }}" class="btn btn-outline-primary btn-lg m-3">Home page</a>
+		</div>
+	</div>
+{% endblock %}
+

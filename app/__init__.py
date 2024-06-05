@@ -21,4 +21,8 @@ def create_app():
         print(url_for("main.invoice_event_callback", _external=True))
         return render_template("home.html")
 
+    @app.errorhandler(404)
+    def page_not_found(error):
+        return render_template('page_not_found.html'), 404
+
     return app

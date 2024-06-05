@@ -3,10 +3,20 @@
 	<title>Home Page| Marketing Agency</title>
 {% endblock %}
 {% block body %}
-<img src="{{ url_for('static', filename='image/LexOfficeImg.jpg') }}" class="img-fluid" alt="Home Image">
-<div class="container">
-	<h1 class="display-1">Welcome to Maketing Agency tracker</h1>
-	<p class="lead">Our webapp helps you to track your client's customer sales using there lex office and/or Sevdesk business accounts.</p>
-	<a href="{{ url_for('main.register') }}" class="btn btn-outline-success">Join now </a>
+	<div class="container align-items-center">
+		<div class="d-flex justify-content-center mt-5">
+			<div class="vstack text-bg-dark">
+			<h1 class="display-1 text-center text-light text-break py-2">It’s Our Business to Grow Yours.</h1>
+			<p class="lead text-center text-bg-success fw-medium py-2">Track your clients sales done in LexOffice and Sevdesk</p>
+			</div>
+		</div>
+	</div>
+<div class="container my-5 position-relative">
+	<img src="{{ url_for('static', filename='image/bg-img.jpg') }}" class="img-fluid" alt="Home Image">
+	<div class="position-absolute top-0 start-0 p-5 mt-5">
+	<h1 class="display-1 p-2 text-bg-light">Welcome to Maketing Agency tracker</h1>
+	<p class="lead text-dark">Our webapp helps you to track your client's customer sales using there lex office and/or Sevdesk business accounts.</p>
+	<a href="{{ url_for('main.register') }}" class="btn btn-success">Join now </a>
+	</div>
 </div>
 {% endblock %}
