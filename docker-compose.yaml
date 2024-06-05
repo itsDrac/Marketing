@@ -1,0 +1,33 @@
+version: '3'
+services:
+  # Postgress database
+  pgdb:
+    image: postgres:16-alpine
+    container_name: database
+    volumes:
+      - pgdata:/var/lib/podtgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+  # Flask App.
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend
+    environment:
+      FLASK_SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://postgres:DatabasePassword@database/postgres"
+      FLASK_LOGIN_FUNCTION: "main.login"
+      FLASK_ADMIN_LIST: ${FLASK_ADMIN_LIST}
+      FLASK_SERVER_NAME: ${FLASK_SERVER_NAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      FLASK_DEBUG: ${FLASK_DEBUG}
+      FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}
+    depends_on:
+      - pgdb
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
