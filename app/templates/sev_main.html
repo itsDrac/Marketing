@@ -35,7 +35,9 @@
 						</a>
 					</td>
 					<td class="text-center">
-						<button class="btn btn-outline-info">stats</button>
+						<a class="btn btn-outline-danger" href={{ url_for('main.lex_delete', lexid=lexacc.id ) }}>
+							Delete
+						</a>
 					</td>
 				</tr>
 				{% endfor %}
