@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
 	<title>Lex Office Main Page| Marketing Agency</title>
-	<script src="https://unpkg.com/htmx.org@1.9.12"></script>
 {% endblock %}
 {% block body %}
 <div class="container">
@@ -20,7 +19,7 @@
 					<th scope="col">S.no.</th>
 					<th scope="col">Organization Name</th>
 					<th scope="col">Added on.(UTC time)</th>
-					<th scope="col" colspan="2" class="text-center">Actions</th>
+					<th scope="col" colspan="3" class="text-center">Actions</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -35,6 +34,11 @@
 					<td class="text-center">
 						<a href={{ url_for('main.lex_customer', lexid=lexacc.id ) }}>
 						<button class="btn btn-primary">Customers</button>
+						</a>
+					</td>
+					<td class="text-center">
+						<a class="btn btn-outline-danger" href={{ url_for('main.lex_delete', lexid=lexacc.id ) }}>
+							Delete
 						</a>
 					</td>
 				</tr>

@@ -9,7 +9,8 @@ from app.utils import (
         login_required,
         subscribe_to_invoice_event,
         add_invoice, is_admin,
-        fetch_sev_invoice
+        fetch_sev_invoice,
+        unsubscribe_invoice_event
         )
 from flask import (
         Blueprint,
@@ -116,7 +117,8 @@ def lex_main():
                 )
         db.session.add(lexacc)
         db.session.commit()
-        subscribe_to_invoice_event(lexacc.id)
+        lexacc.eventID = subscribe_to_invoice_event(lexacc.id)
+        db.session.commit()
         return redirect(url_for("main.lex_main"))
 
     lexaccs = db.session.execute(
@@ -142,6 +144,24 @@ def lex_get_org():
             orgname=res.json().get("companyName"),
             orgid=res.json().get("organizationId")
             )
+
+
+@bp.route('/lex-delete/<int:lexid>')
+@login_required
+def lex_delete(lexid: int):
+    currentAgency = session['currentAgency']
+    currentLexacc = db.get_or_404(LexAccModel, lexid)
+    if not (
+        currentLexacc.agency_id == currentAgency.get('id') or currentAgency.get('isAdmin')
+    ):
+        flash("Delete can not be performed", "warning")
+        return redirect(url_for('main.lex_main'))
+    if currentLexacc.eventID:
+        unsubscribe_invoice_event(currentLexacc)
+    db.session.delete(currentLexacc)
+    db.session.commit()
+    flash(f"{currentLexacc.name} is deleted", "danger")
+    return redirect(url_for('main.lex_main'))
 
 
 @bp.route('/lex-customer/<int:lexid>', methods=["GET", "POST"])

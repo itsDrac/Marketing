@@ -55,6 +55,7 @@ class LexAcc(db.Model):
             )
     name: Mapped[str]
     source: Mapped[str] = mapped_column(nullable=False)
+    eventID: Mapped[Optional[str]] = mapped_column(init=False)
     added_on: Mapped[datetime] = mapped_column(default_factory=datetime.utcnow)
 
     def add_customer(self, lexID, name):

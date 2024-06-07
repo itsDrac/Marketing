@@ -5,9 +5,15 @@ services:
     image: postgres:16-alpine
     container_name: database
     volumes:
-      - pgdata:/var/lib/podtgresql/data
+      - pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
 
   # Flask App.
   server:
@@ -19,7 +25,7 @@ services:
       FLASK_SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://postgres:DatabasePassword@database/postgres"
       FLASK_LOGIN_FUNCTION: "main.login"
       FLASK_ADMIN_LIST: ${FLASK_ADMIN_LIST}
-      FLASK_SERVER_NAME: ${FLASK_SERVER_NAME}
+      FLASK_SERVER_NAME: "0443-2401-4900-1c68-3640-3caa-bf7d-60f3-92eb.ngrok-free.app"
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       FLASK_DEBUG: ${FLASK_DEBUG}
       FLASK_SECRET_KEY: ${FLASK_SECRET_KEY}

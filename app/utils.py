@@ -41,25 +41,38 @@ def subscribe_to_invoice_event(lexaccID):
             }
     jsonData = {
             "eventType": "invoice.created",
-            # "callbackUrl": "https://d3a6-2401-4900-1c68-b58c-eca1-6637-1588-e292.ngrok-free.app"+"/invoice-event-callback"
-            "callbackUrl": url_for("main.invoice_event_callback", _external=True)
+            # "callbackUrl": "http://10ef-2401-4900-1c68-3640-65b7-5f5e-1008-cb49.ngrok-free.app"+"/invoice-event-callback"
+            "callbackUrl": url_for("main.invoice_event_callback",
+                                   _scheme="https", _external=True)
             }
     res = rq.post(
             "https://api.lexoffice.io/v1/event-subscriptions",
             headers=headers,
             json=jsonData
             )
-
-    if res.json().get("id"):
-        print("invoice event subscribed")
-        print(res.json().get("resourceUri"))
+    eventID = res.json().get("id")
+    if eventID:
         flash(f"{currentLexacc.name} is subscribed to invoice created", "success")
-        return
+        return eventID
     else:
-        print(res.json())
-        print(res.status_code)
         print("invoice event did not subscribed")
         flash(f"{currentLexacc.name} is not subscribed to invoice created", "warning")
+        return ""
+
+
+def unsubscribe_invoice_event(currentLexacc):
+    key = "Bearer " + currentLexacc.key.strip()
+    headers = {
+            "Authorization": key,
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+            }
+    rq.delete(
+            "https://api.lexoffice.io/v1/event-subscriptions/"+currentLexacc.eventID,
+            headers=headers,
+            )
+    print("invoice event unsubscribed")
+    return
 
 
 def add_invoice(invoice_data):
