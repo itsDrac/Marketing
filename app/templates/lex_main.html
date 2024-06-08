@@ -19,7 +19,7 @@
 					<th scope="col">S.no.</th>
 					<th scope="col">Organization Name</th>
 					<th scope="col">Added on.(UTC time)</th>
-					<th scope="col" colspan="3" class="text-center">Actions</th>
+					<th scope="col" colspan="2" class="text-center">Actions</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -28,9 +28,6 @@
 					<th scope="row">{{ loop.index }}</th>
 					<td>{{ lexacc.name }}</td>
 					<td>{{ lexacc.added_on.strftime("%d-%b-%Y") }}</td>
-					<td class="text-center">
-						<button class="btn btn-warning">Edit</button>
-					</td>
 					<td class="text-center">
 						<a href={{ url_for('main.lex_customer', lexid=lexacc.id ) }}>
 						<button class="btn btn-primary">Customers</button>

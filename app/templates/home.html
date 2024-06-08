@@ -5,18 +5,36 @@
 {% block body %}
 	<div class="container align-items-center">
 		<div class="d-flex justify-content-center mt-5">
-			<div class="vstack text-bg-dark">
-			<h1 class="display-1 text-center text-light text-break py-2">It’s Our Business to Grow Yours.</h1>
-			<p class="lead text-center text-bg-success fw-medium py-2">Track your clients sales done in LexOffice and Sevdesk</p>
+			<div class="vstack">
+			<h1 class="display-1 text-center text-break fw-medium py-2">It’s Our Business to Grow Yours.</h1>
+			<p class="lead text-center fs-3 fw-medium py-2">Track your clients sales done in LexOffice and Sevdesk</p>
+			<a href={{ url_for('main.login') }} class="mx-auto px-5 btn btn-success btn-lg">Login</a>
+			</div>
+		</div>
+	<img src="{{ url_for('static', filename='image/bg-img.jpg') }}" class="my-3 img-fluid" alt="Home Image">
+	<p class="lead text-center fs-2 fw-medium my-2">Über 100+ Marketing-Agenturen vertrauen uns</p>
+	</div>
+	<section class="text-bg-dark p-5 text-light">
+		<div class="row">
+			<div class="col-6">
+				<p class="fs-6 fw-medium">MÜHELOSE AUTOMATISIERTE BERICHTERSTELLUNG</p>
+				<h1 class="display-1 text-break fw-medium py-2">Keine Zeitverschwendung mit manuellen Berichten</h1>
+				<p class="fs-6">Es ist an der Zeit, die Tabellenkalkulationen wegzulegen und keine Zeit mehr mit manuellen Kundenberichten zu verschwenden. Mit vollautomatischen Berichten und benutzerdefinierten Dashboards haben Sie alles, was Sie brauchen, um Zeit zu sparen, Kunden zu beeindrucken und Ihre Marketingagentur zu vergrößern.</p>
+			</div>
+			<div class="col-6">
+				<img src="{{ url_for('static', filename='image/bg-img-1.jpg') }}" class="my-3 img-fluid" alt="Home Image">
+			</div>
+		</div>
+	</section>
+	<section class="text-bg-primary p-5">
+	<div class="container align-items-center">
+		<div class="d-flex justify-content-center mt-5">
+			<div class="vstack">
+			<h1 class="display-1 text-center text-break fw-medium py-2">The Marketing Agency</h1>
+			<p class="fs-6 fw-medium text-center">Be a part of it and get access to details</p>
+			<a href={{ url_for('main.register') }} class="mb-5 text-center mx-auto px-5 btn btn-success btn-lg">join now</a>
 			</div>
 		</div>
 	</div>
-<div class="container my-5 position-relative">
-	<img src="{{ url_for('static', filename='image/bg-img.jpg') }}" class="img-fluid" alt="Home Image">
-	<div class="position-absolute top-0 start-0 p-5 mt-5">
-	<h1 class="display-1 p-2 text-bg-light">Welcome to Maketing Agency tracker</h1>
-	<p class="lead text-dark">Our webapp helps you to track your client's customer sales using there lex office and/or Sevdesk business accounts.</p>
-	<a href="{{ url_for('main.register') }}" class="btn btn-success">Join now </a>
-	</div>
-</div>
+	</section>
 {% endblock %}
