@@ -1,9 +1,12 @@
-import os
-
 from flask import Flask, render_template, url_for
+from dotenv import load_dotenv
 from app.database import db
 from app.routes import bp
 from app.admin import bp as admin_bp
+from app.deutsche import bp as deut_bp
+
+
+load_dotenv()
 
 
 def create_app():
@@ -13,6 +16,7 @@ def create_app():
     db.init_app(app)
     app.register_blueprint(bp)
     app.register_blueprint(admin_bp, url_prefix="/admin")
+    app.register_blueprint(deut_bp, url_prefix="/deutsche")
     with app.app_context():
         db.create_all()
 
