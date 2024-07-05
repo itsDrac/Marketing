@@ -5,13 +5,31 @@ import base64
 import requests
 from urllib import parse
 from app.deutsche import bp
+from app.deutsche.utils import get_access_token
 from flask import (
     request,
+    render_template,
     redirect,
     flash,
     url_for,
     session,
     )
+
+# Make a seprate function which'll check if session has refresh token then get the access token and return the html file with form. If not then redirect to login_to_bank function.  # noqa: E501
+
+
+@bp.route('/', methods=["GET", "POST"])
+def deutsche_bank():
+    if not session.get('deutsche'):
+        return redirect(url_for('deutsche.login_to_bank'))
+    transactions = {}
+    if request.method == "POST":
+        if not session.get('deutsche').get("accessToken"):
+            return redirect(url_for('deutsche.login_to_bank'))
+        transactions = get_history(request.form)
+        print("here came?\t l:30")
+        print(transactions)
+    return render_template("deut_main.html", transactions=transactions)
 
 
 @bp.route('/login-to-bank')
@@ -68,6 +86,41 @@ def deutsche_auth():
     sessionDeutsche["accessToken"] = resultData.get("access_token")
     sessionDeutsche["refershToken"] = resultData.get("refresh_token")
     session['deutsche'] = sessionDeutsche
-    # TODO: Create a HTML file with 1 input and 2 date field Input for IBAN and Dates for From and To date. # noqa E501 
-    # TODO: Create a new route which will take above values as input and return html with Transactions data init.  # noqa E501
-    return res.text
+    return redirect(url_for('deutsche.deutsche_bank'))
+
+
+def get_history(formData):
+    sessionDeutsche = {}
+    # Get form data. (IBAN, from and to date).
+    print("This is form data\n", formData)
+    # Get access token from session.
+    accessToken = "Bearer " + session.get('deutsche').get("accessToken")
+    # Make request to deutsche bank to get Transactions history.
+    requestHeaders = {
+        "Authorization": accessToken
+        }
+    requestParams = {
+        "iban": formData.get("iban"),
+        "limit": 15,
+        }
+    if formData.get("form_date"):
+        requestParams["bookingDateFrom"] = formData.get("form_date")
+    if formData.get("to_date"):
+        requestParams["bookingDateTo"] = formData.get("to_date")
+    res = requests.get('https://simulator-api.db.com:443/gw/dbapi/banking/transactions/v2', headers=requestHeaders, params=requestParams)  # noqa: E501
+    print(res.status_code)
+    if res.status_code == 400:
+        flash("Unable to fetch transactions, enter valid dates", "danger")
+        return {}
+    # check response if access token expired then call get_access_token
+    if res.status_code == 401:
+        refershToken = session.get('deutsche').get("refershToken")
+        sessionDeutsche["accessToken"] = get_access_token(refershToken)
+        session['deutsche'] = sessionDeutsche
+        flash("Re-loggedin to bank, Please try again", "warning")
+        return {}
+    # Parse and send selected Data.
+    print(res.json())
+    # Make HTML file and Table with given data.
+    # Return data.
+    return res.json().get("transactions")

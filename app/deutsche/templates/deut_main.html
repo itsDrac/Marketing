@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Deutsche Page | Marketing Agency</title>
+{% endblock %}
+{% block body %}
+	<div class="container">
+		<h1 class="display-1 mt-4">Deutsche Transactions History </h1>
+		<p class="lead pt-2 mb-4">Entre the IBAN number of customer you just loggedIn with, and enter the From and To date, This page will show Top 10 Transactions from account, If to date is not entred current date will be taken.</p>
+
+		<form class="row" method="POST">
+			<div class="col-8">
+			<label for="iban" class="form-label">IBAN number: </label>
+			<input class="form-control" id="iban" name="iban" type="text" placeholder="IBAN number for account." aria-label="IBAN number for account." required>
+			</div>
+			<div class="col-2">
+			<label for="from-date" class="form-label">From: </label>
+			<input class="form-control" id="from-date" name="form_date" type="date" placeholder="YYYY-MM-DD" aria-label="From Date in YYYY-MM-DD format">
+			</div>
+			<div class="col-2">
+			<label for="to-date" class="form-label">To: </label>
+			<input class="form-control" id="to-date" name="to_date" type="date" placeholder="YYYY-MM-DD" aria-label="To Date in YYYY-MM-DD format">
+			</div>
+			<div class="col-12 mt-3">
+					<button type="submit" class="btn btn-primary mb-3 d-block text-center">Get Taransaction history</button>
+			</div>
+			<div id="indicator" class="col-auto htmx-indicator">
+				<div class="spinner-grow text-warning" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+			</div>
+		</form>
+		<section id="history-data" class="justify-content-center py-3">
+			{% if transactions %}
+			<table class="table table-bordered table-striped table-hover mb-5">
+				<thead>
+					<tr>
+						<th scope="col">S.no.</th>
+						<th scope="col">Party Name</th>
+						<th scope="col">Party Iban</th>
+						<th scope="col">Date(YYYY-MM-DD)</th>
+						<th scope="col">Amount</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for transaction in transactions %}
+					<tr>
+						<th scope="row">{{ loop.index }}</th>
+						<td>{{ transaction.get("counterPartyName") }}</td>
+						<td>{{ transaction.get("creditorId") }}</td>
+						<td class="text-center">{{ transaction.get("bookingDate") }}</td>
+						<td class="text-center">
+							<p class="text-{% if transaction.get("amount") > 0 %}success{% else %}danger{% endif %}">
+							{{ transaction.get("amount") }}
+							</p>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			{% endif %}
+		</section>
+	</div>
+{% endblock %}
