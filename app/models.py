@@ -5,6 +5,13 @@ from sqlalchemy import ForeignKey
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing import List, Optional
 from datetime import datetime
+import sqlalchemy as sa
+import sqlalchemy.orm as so
+
+# TODO: Optimize defining on fileds, such as:
+# TODO: For email have: email: Mapped[str] = mapped_column(sa.String(60), unique=True)
+# TODO: replace id with _id throughout the codebase.
+# TODO: Make more functional and scalable tables.
 
 
 class Agency(db.Model):
@@ -12,6 +19,12 @@ class Agency(db.Model):
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str] = mapped_column(deferred=True)
     lex_acces: Mapped[Optional[List["LexAcc"]]] = relationship(
+            back_populates="agency", cascade="all, delete-orphan", init=False
+            )
+    manual: Mapped[Optional[List["Manual"]]] = relationship(
+            back_populates="agency", cascade="all, delete-orphan", init=False
+            )
+    bank_users: so.WriteOnlyMapped["BankUser"] = relationship(
             back_populates="agency", cascade="all, delete-orphan", init=False
             )
 
@@ -102,3 +115,28 @@ class Customer(db.Model):
 #     customer: Mapped["Customer"] = relationship(back_populates="invoices")
 #     gorssAmount: Mapped[float] = mapped_column(nullable=False)
 #     netAmount: Mapped[float] = mapped_column(nullable=False)
+class Manual(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    agency_id: Mapped[int] = mapped_column(ForeignKey("agency.id"))
+    agency: Mapped["Agency"] = relationship(back_populates="manual")
+    identifier: Mapped[str] = mapped_column(unique=True)
+    source: Mapped[str] = mapped_column(nullable=False)
+    name: Mapped[str]
+    totalAmount: Mapped[float] = mapped_column(
+            init=False,
+            nullable=False,
+            default_factory=lambda: 0.0
+            )
+    addedOn: Mapped[datetime] = mapped_column(default_factory=datetime.utcnow)
+
+
+class BankUser(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    email: Mapped[str] = mapped_column(sa.String(60), unique=True)
+    phone: Mapped[str] = mapped_column(sa.String(15), unique=True)
+    password: Mapped[str]
+    refresh_token: Mapped[Optional[str]] = mapped_column(sa.String(256), init=False)
+    webform_id: Mapped[Optional[str]] = mapped_column(sa.String(256), init=False)
+    agency_id: Mapped[int] = mapped_column(sa.ForeignKey("agency.id"))
+    agency: Mapped["Agency"] = relationship(back_populates="bank_users")
+    is_connected: Mapped[bool] = mapped_column(default_factory=lambda: False)

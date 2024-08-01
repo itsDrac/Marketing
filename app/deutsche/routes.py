@@ -44,7 +44,7 @@ def login_to_bank():
     requestParams = {
         "client_id": os.getenv("DEUTSCHE_CLIENT_ID"),
         "response_type": "code",
-        "redirect_uri": "https://4e6c-110-235-238-86.ngrok-free.app/deutsche/deutsche-auth",  # noqa: E501
+        "redirect_uri": os.getenv("HOST_URL")+"deutsche/deutsche-auth",  # noqa: E501
         # TODO: Need to have scheme as "https"
         # "redirect_uri": url_for("deutsche.deutsche_auth",
         #                         _scheme="https", _external=True),
@@ -68,7 +68,7 @@ def deutsche_auth():
         "code": authCode,
         # "redirect_uri": url_for("deutsche.deutsche_auth",
         #                         _scheme="https", _external=True),
-        "redirect_uri": "https://4e6c-110-235-238-86.ngrok-free.app/deutsche/deutsche-auth",  # noqa: E501
+        "redirect_uri": os.getenv("HOST_URL")+"deutsche/deutsche-auth",  # noqa: E501
         "code_verifier": codeVerifier
         }
     authHeader = base64.urlsafe_b64encode(

@@ -1,7 +1,8 @@
 from app.models import (
         Agency as AgencyModel,
         LexAcc as LexAccModel,
-        Customer as CustomerModel
+        Customer as CustomerModel,
+        Manual as ManualModel
         )
 from app.errors import UserDoesntExist, UserAlreadyExist, CustomerAlreadyExist
 from app.database import db
@@ -21,6 +22,7 @@ from flask import (
         url_for,
         session,
         )
+from datetime import datetime as dt
 import requests as rq
 
 
@@ -34,7 +36,7 @@ bp = Blueprint('main',
 @bp.route("/session")
 def check_session():
     currentAgency = session.get('currentAgency')
-    agency = db.session.execute(db.select(AgencyModel).where(AgencyModel.id == currentAgency.get("id"))).scalar_one_or_none()
+    agency = db.session.execute(db.select(AgencyModel).where(AgencyModel.id == currentAgency.get("id"))).scalar_one_or_none()  # noqa: E:501
     if not agency:
         return "Couldn't fetch agency"
 
@@ -152,7 +154,7 @@ def lex_delete(lexid: int):
     currentAgency = session['currentAgency']
     currentLexacc = db.get_or_404(LexAccModel, lexid)
     if not (
-        currentLexacc.agency_id == currentAgency.get('id') or currentAgency.get('isAdmin')
+            currentLexacc.agency_id == currentAgency.get('id') or currentAgency.get('isAdmin')  # noqa: E:501
     ):
         flash("Delete can not be performed", "warning")
         return redirect(url_for('main.lex_main'))
@@ -210,7 +212,6 @@ def lex_get_customer():
     headers = {"Authorization": key, "Accept": "application/json"}
     url = "https://api.lexoffice.io/v1/contacts/"+customerId.strip()
     res = rq.get(url, headers=headers)
-    print(res.json())
     if res.status_code != 200:
         return render_template("htmx/lex_customer_name.html", customerName=None)
     return render_template(
@@ -318,7 +319,7 @@ def sev_invoice(sevid: int):
                 ).scalar_one_or_none()
         if not existingCustomer:
             existingCustomer = currentSevacc.add_customer(customerSevID, customerName)
-        existingCustomer.totalGrossAmount += float(res.get("objects")[0].get("sumGross"))
+        existingCustomer.totalGrossAmount += float(res.get("objects")[0].get("sumGross"))  # noqa: E:501
         existingCustomer.totalNetAmount += float(res.get("objects")[0].get("sumNet"))
         db.session.commit()
 
@@ -347,3 +348,37 @@ def sev_get_invoice():
     customerName = f"{res.json().get('objects')[0].get('contact').get('surename')} \
 {res.json().get('objects')[0].get('contact').get('familyname')}"
     return render_template("htmx/sev_invoice_details.html", customerName=customerName)
+
+# TODO: Add functionality to add entry manually. with given bank options.
+# TODO: Add a get route to see all the manual entries.
+# TODO: Add a post route which will send form Data to add manual entries.
+# Make a HTML file to see and add manual entries.
+
+
+@bp.route("/manual-entry", methods=["GET", "POST"])
+@login_required
+def manual_entry():
+    agency_id = session['currentAgency'].get("id")
+    currentAgency = db.get_or_404(AgencyModel, agency_id)
+    if request.method == "POST":
+        print(request.form, currentAgency)
+        formData = request.form
+        existingEntry = db.session.execute(db.select(ManualModel).where(ManualModel.identifier == formData["identifier"])).scalar_one_or_none()  # noqa E:501
+        if not existingEntry:
+            newEntry = ManualModel(
+                    name=formData["name"],
+                    source=formData["source"],
+                    identifier=formData["identifier"],
+                    agency_id=currentAgency.id,
+                    agency=currentAgency
+                    )
+            db.session.add(newEntry)
+            db.session.commit()
+            existingEntry = newEntry
+        existingEntry.totalAmount += float(formData["amount"])
+        existingEntry.addedOn = dt.utcnow()
+        db.session.commit()
+
+    entries = db.session.execute(db.select(ManualModel).where(ManualModel.agency_id == currentAgency.id)).scalars()  # noqa E:501
+
+    return render_template("manual.html", entries=entries)

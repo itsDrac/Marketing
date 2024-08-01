@@ -11,6 +11,8 @@
 			<a class="mx-2 nav-link {% if page == "lex_main" %}active{% endif %}" aria-current="{% if page == "lex_main" %}true{% else %} false{% endif %}" href="{{ url_for('main.lex_main') }}">Lex Office Accounts</a>
 			<a class="mx-2 nav-link {% if page == "sev_main" %}active{% endif %}" aria-current="{% if page == "sev_main" %}true{% else %} false{% endif %}" href="{{ url_for('main.sev_main') }}">Sevdesk Accounts</a>
 			<a class="mx-2 nav-link {% if page == "deutsche" %}active{% endif %}" aria-current="{% if page == "deutsche" %}true{% else %} false{% endif %}" href="{{ url_for('deutsche.deutsche_bank') }}">Deutsche</a>
+			<a class="mx-2 nav-link {% if page == "deutsche" %}active{% endif %}" aria-current="{% if page == "deutsche" %}true{% else %} false{% endif %}" href="{{ url_for('finapi.main') }}">Bank connections</a>
+			<a class="mx-2 nav-link {% if page == "manual_entry" %}active{% endif %}" aria-current="{% if page == "manual_entry" %}true{% else %} false{% endif %}" href="{{ url_for('main.manual_entry') }}">Manual</a>
 		</div>
 		<div class="navbar-nav ms-auto">
 		{% if session.currentAgency.isAdmin %}

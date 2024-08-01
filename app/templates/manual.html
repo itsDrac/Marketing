@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Lex Office Main Page| Marketing Agency</title>
+{% endblock %}
+{% block body %}
+<div class="container">
+	<section class="my-3">
+		<h1 class="display-1">Manual entry Page.</h1>
+		<p class="lead">This page shows the list of entries added manually<p>
+		<p class="lead">To add new manual entry click in the below button and fill the form <br/>Note: you can select source from given list, give a unique id in the Identifier filed this can be IBAN number or email address. If already existing Identifier is given the amount will be incremented to existing balance.<p>
+		<div class="mt-5">
+			<button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#AddEntryModel">Add new account</button>
+		</div>
+	</section>
+	{% if entries %}
+	<section class="my-3">
+		<table class="table table-bordered table-striped table-hover">
+			<thead>
+				<tr>
+					<th scope="col">S.no.</th>
+					<th scope="col">Identifier</th>
+					<th scope="col">Customer Name</th>
+					<th scope="col" class="text-center">Amount</th>
+					<th scope="col" class="text-center">Updated Date</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for entry in entries %}
+				<tr>
+					<th scope="row">{{ loop.index }}</th>
+					<td>{{ entry.identifier }}</td>
+					<td>{{ entry.name }}</td>
+					<td>{{ entry.totalAmount }}</td>
+					<td>{{ entry.addedOn.strftime("%d-%b-%Y") }}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</section>
+	{% endif %}
+</div>
+	<!-- Vertically centered modal -->
+	<div class="modal fade" id="AddEntryModel" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Add Manual Entry</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p>Fill in below form to add manual entry.</p>
+					<form class="row" method="POST">
+						<div class="col-12 my-2">
+							<label for="name" class="form-label">Customer Name</label>
+							<input class="form-control" id="name" name="name" required type="text" placeholder="Customer name" aria-label="Name">
+						</div>
+						<div class="col-5 my-2">
+							<label for="amount" class="form-label">Amount of Invoice</label>
+							<input class="form-control" id="amount" name="amount" required type="number" placeholder="Amount" aria-label="Amount" min=0>
+						</div>
+						<div class="col-5 mx-auto my-2">
+							<label for="source" class="form-label">Source</label>
+							<select id="source" name="source" class="form-select">
+								<option>Deutsche Bank</option>
+								<option>Mail<option>
+							</select>
+						</div>
+						<div class="col-12">
+							<label for="identifier" class="form-label">Unique Identifier</label>
+							<input class="form-control" id="identifier" name="identifier" required type="text" placeholder="unique identifier such as IBAN or E-mail address." aria-label="unique identifier such as IBAN or E-mail address.">
+						</div>
+						<button required type="submit" class="col-12 btn btn-success my-4 px-auto text-center">Submit</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+<p class="text-success">Current account balance is: {{ balance }}</p>
+<table class="table table-primary table-bordered table-striped table-hover my-4">
+	<thead>
+		<tr>
+			<th scope="col">S.no.</th>
+			<th scope="col">Account ID</th>
+			<th scope="col">Bank Booking Date</th>
+			<th scope="col">Amount</th>
+			<th scope="col">Purpose</th>
+			<th scope="col">Counterpart BankName</th>
+		</tr>
+	</thead>
+	<tbody>
+{% for transaction in transactions %}
+	<tr>
+		<th scope="row">{{ loop.index }}</th>
+		<td>{{ transaction.accountId }}</td>
+		<td>{{ transaction.bankBookingDate }}</td>
+		<td>{{ transaction.amount }}</td>
+		<td>{{ transaction.purpose }}</td>
+		<td>{{ transaction.counterpartBankName }}</td>
+	</tr>
+{% endfor %}
+	</tbody>
+</table>
+

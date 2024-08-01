@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block head %}
+	<title>Banks Page | Marketing Agency</title>
+{% endblock %}
+{% block body %}
+	<div class="container">
+		<h1 class="display-1 mt-4">Customer's Bank Account History</h1>
+		<p class="lead pt-2 mb-4">In this page you'll be able to see last few bank transactions of the added customer, To add customer click on below button and fill in the form, After submittion of form  you'll be asked to connect the user with bank, to do so please click on the given link to connect the user with A bank account. You'll be redirected to Finapi form page, You can use IBAN or BLZ to connect customer with there bank account.</p>
+		<div class="mt-5">
+			<button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#AddCustomerModel">Add new customer</button>
+		</div>
+		<table class="table table-bordered table-striped table-hover my-4">
+			<thead>
+				<tr>
+					<th scope="col">S.no.</th>
+					<th scope="col">Email</th>
+					<th scope="col">Phone Number</th>
+					<th scope="col" colspan="2" class="text-center">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+		{% for customer in customers %}
+			<tr>
+				<th scope="row">{{ loop.index }}</th>
+				<td>{{ customer.email }}</td>
+				<td>{{ customer.phone }}</td>
+				<td class="text-center">
+					<button class="btn btn-success" hx-get="{{ url_for('finapi.fetch_transactions') }}" data-bs-toggle="modal" data-bs-target="#transactions" hx-target="#transactions-table" hx-indicator="#transactions-indicator" hx-vals='{"customer_id": "{{ customer.id }}"}'>View transaction history</button>
+				</td>
+				<td class="text-center">
+					<button class="btn btn-primary" hx-get="{{ url_for('finapi.get_webForm') }}" data-bs-toggle="modal" data-bs-target="#webFormModel" hx-target="#custom-webform_link" hx-indicator="#webForm-indicator" hx-vals='{"customer_id": "{{ customer.id }}"}'>Connect Bank</button>
+				</td>
+			</tr>
+
+		{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<!-- Create user and webform link -->
+<div class="modal fade" id="AddCustomerModel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Add Bank Customer</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<p>Please fill in the below form to create a new customer and wait for the link to connect this customer with bank account.</p>
+				<p class="text-danger">Password should be bigger than 8 character.</p>
+				<form method="POST">
+					<label for="emailInput" class="form-label">Email address</label>
+					<input class="form-control" id="emailInput" name="email" type="email" required placeholder="Email of customer." aria-label="Enter the email of bank customer.">
+					<label for="phoneInput" class="form-label">Phone Number</label>
+					<input class="form-control" id="phoneInput" name="phone" type="tel" required placeholder="+49 99 999999-999" aria-label="Enter the phone number of bank customer.">
+					<label for="passwordInput" class="form-label">Password</label>
+					<input class="form-control" id="passwordInput" name="password" type="password" required placeholder="password of customer." aria-label="Enter the password of bank customer.">
+					<button type="button" class="my-2 btn btn-outline-success" hx-post="{{ url_for('finapi.create_customer') }}" hx-target="#webform_link" hx-indicator="#indicator">Create</button>
+				</form>
+				<div id="indicator" class="col-auto htmx-indicator">
+					<div class="spinner-grow text-success" role="status">
+						<span class="visually-hidden">Loading...</span>
+					</div>
+				</div>
+				<div id="webform_link">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+	<!-- Webform link. -->
+<div class="modal fade" id="webFormModel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Get the form link.</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<p>Please click on below button to fill the form and connect bank.</p>
+				<div id="webForm-indicator" class="col-auto htmx-indicator">
+					<div class="spinner-grow text-success" role="status">
+						<span class="visually-hidden">Loading...</span>
+					</div>
+				</div>
+				<div id="custom-webform_link">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+	<!-- transactions table. -->
+<div class="modal fade" id="transactions" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+	<div class="modal-lg modal-dialog modal-dialog-scrollable modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Get the form link.</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div id="transactions-indicator" class="col-auto htmx-indicator">
+					<div class="spinner-grow text-success" role="status">
+						<span class="visually-hidden">Loading...</span>
+					</div>
+				</div>
+				<div id="transactions-table">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
